@@ -1,36 +1,62 @@
-function g_search(keyword, selectSite, resultLimit=30) // keyword = anime name; selectSite = websiteurl for google search
+function g_search(keyword, selectSite)
 {
-	const https = require("https");
-	let path = "/search?q=" + encodeURIComponent(keyword) + "site%3A"
-	let originResponseText;
-	selectSite.forEach( (element) => {
-		path += element;
-	} )
-	//	console.log("url=", path);
-	const requestObj = {
-		hostname: "www.google.com",
-		path: path,
-		headers: {	//header you can changer it by yourself
-			//"User-Agent":"",
-			"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv: 78.0) Gecko/20100101 Firefox/78.0",
-		}
-	}
+	const req = require("https");
+	let promises = [];
+	let searchResult = [];
+	selectSite.forEach( element => {
+		const searchFun = new Promise( (resolve,reject) => {
+			const requestObj = {
+				hostname: "www.google.com",
+				path: "/search?q=" + encodeURIComponent(keyword) + "site%3A" + element.path,
+				headers: {
+					"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv; 78.0) Gecko/20100101 Firefox/78.0" 
+				}
+			}
+			const responseBody = req.request(requestObj, (response) => {
+				let originData = "";
+				let matchArry = [];
+				response.on("data", data => {
+					originData += data;
+				})
+				response.on("end", () => {
+					let matchAll = originData.match(element.regExp) || [];
+					matchAll.forEach( value => {
+						if (! matchArry.includes(value)) {
+							matchArry.push(value);
+						}
+					} );
+					resolve( matchArry );
+				})
+			})
+			responseBody.on("error", error => {
+				reject("Google Search Request Error:\n" + error);
+			})
+			responseBody.end();
+		} );
 
-	const requestBody = https.request( requestObj, (response) => {
-		//console.log("status: ", response.statusCode); // debug
-		response.on("data", (data) => {
-			originResponseText += data.toString();
-		})
-		response.on("end", async () => {
-			return await originResponseText.match(/https:\/\/myself-bbs\.com\/thread-\d{5}-\d{1}-\d{1}\.html/g).slice(0,resultLimit);
-		})
-	} )
-	requestBody.on("error", (error) => {
-		console.log("Google Search Request Error:\n", error);
-		return (-1);
+		promises.push(searchFun);
+	} );
+
+	return Promise.all(promises).then(results => {
+		results.forEach( result => {
+			searchResult.push(...result);
+		} );
+		return searchResult;
 	})
-	requestBody.end();
+		.catch( error => {
+			console.log(error);
+			return -1;
+		} );
 }
+/*
+ * test
 
-
-// test
+const input = require("readline");
+const rl = input.createInterface({
+	input: process.stdin,
+	output: process.stdout,
+});
+rl.question( "input : ", async ans => {
+	console.log(await g_search(ans, [{path: "myself-bbs.com", regExp: /https:\/\/myself-bbs\.com\/thread-\d{5}-\d{1}-\d{1}\.html/g}]));
+} );
+*/
