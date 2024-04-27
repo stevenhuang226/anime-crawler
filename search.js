@@ -1,5 +1,5 @@
-function g_search(keyword, selectSite)
-{
+async function g_search(keyword, selectSite) {
+	// keyword: anime title; sectSite = [{path: "website.save.anime", regExp: "website.save.anime/static"}]
 	const req = require("https");
 	let promises = [];
 	let searchResult = [];
@@ -42,21 +42,12 @@ function g_search(keyword, selectSite)
 			searchResult.push(...result);
 		} );
 		return searchResult;
-	})
-		.catch( error => {
-			console.log(error);
-			return -1;
-		} );
+	}).catch( error => {
+		console.log(error);
+		return -1;
+	} );
 }
-/*
- * test
 
-const input = require("readline");
-const rl = input.createInterface({
-	input: process.stdin,
-	output: process.stdout,
-});
-rl.question( "input : ", async ans => {
-	console.log(await g_search(ans, [{path: "myself-bbs.com", regExp: /https:\/\/myself-bbs\.com\/thread-\d{5}-\d{1}-\d{1}\.html/g}]));
-} );
-*/
+module.exports = {
+	g_search: g_search
+}
