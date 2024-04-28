@@ -45,7 +45,6 @@ async function myself(theUrl) {
 				let episodeObj = [{}];
 				let ret = await originData.match(/[\s\S]{100}myself-bbs.com\/player\/.*/g) || ["Error No Match Url"];
 				for ( let ptr = 0; ptr < ret.length ; ptr++ ) {
-					console.log(ret[ptr]); // debug
 					episodeObj[ptr] = {title: "Error No Data", url: "Error No Data"}
 					episodeObj[ptr]["title"] = ret[ptr].match(/javascript:;">.*<\/a>/g)[0].replace(/javascript:;">/, "").replace(/<\/a>/, "");
 					episodeObj[ptr]["url"] = ret[ptr].match(/myself-bbs.com\/player\/.*/g)[0];
