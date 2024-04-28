@@ -29,6 +29,7 @@ function selectFun(titleArry, searchResult) {
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
 		console.log( await crawler.typeOfSite(searchResult[ans]) );
+		process.exit(0);
 	});
 };
 searchFun();
