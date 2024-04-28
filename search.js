@@ -83,7 +83,7 @@ async function reqTitle(urlArry) {
 			titleArry.push(element);
 		} )
 		return titleArry;
-	} ).catch("error", (error) => {
+	} ).catch( (error) => {
 		console.log("Request Url Title Error:\n",error);
 		return (-1);
 	});
