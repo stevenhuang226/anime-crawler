@@ -52,7 +52,7 @@ async function reqTitle(urlArry) {
 	const url = require("url");
 	let titleArry = [];
 	let promises = [];
-	urlArry.forEach( (element) => {
+	urlArry.forEach( (element, index) => {
 		const promise = new Promise( (resolve,reject) => {
 			const reqObj = {
 				hostname: url.parse(element).hostname,
@@ -60,30 +60,36 @@ async function reqTitle(urlArry) {
 				headers: {
 					"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv; 78.0) Gecko/20100101 Firefox/78.0" 
 				}
-			}
+			};
 			const reqBody = req.request(reqObj, (response) => {
 				let originData = "";
+				let title = `*${index}* `;
 				response.on("data", (data) => {
 					originData += data;
 				})
 				response.on("end", () => {
-					// TODO
-					// resolve(ans);
+					title += originData.match(/<title>(.*?)<\/title>/)[0].replace(/<title>/, "").replace(/<\/title>/, "");
+					resolve(title);
 				})
 			})
-		})
+			reqBody.on("error", (error) => {
+				reject(error);
+			})
+			reqBody.end();
+		});
 		promises.push(promise);
 	})
 	return Promise.all(promises).then( (results) => {
 		results.forEach( (element) => {
-			titleArry.push(elment);
+			titleArry.push(element);
 		} )
 		return titleArry;
-	} ).catch(error, (error) => {
+	} ).catch("error", (error) => {
 		console.log("Request Url Title Error:\n",error);
 		return (-1);
-	})
+	});
 }
 module.exports = {
-	g_search: g_search
+	g_search: g_search,
+	reqTitle:reqTitle
 }

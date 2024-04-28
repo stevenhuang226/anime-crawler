@@ -11,6 +11,9 @@ const siteInfo = [
 ]
 const webSearch = require("./search.js");
 nodeInput.question("Input Anime Title:", async ans => {
-	console.log(await webSearch.g_search(ans, siteInfo))
+	let searchResult = await webSearch.g_search(ans, siteInfo);
+	let titleArry = await webSearch.reqTitle(searchResult);
+	console.log(searchResult);
+	console.log(titleArry);
 	process.exit(0);
 });
