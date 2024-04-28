@@ -90,5 +90,5 @@ async function reqTitle(urlArry) {
 }
 module.exports = {
 	g_search: g_search,
-	reqTitle:reqTitle
+	reqTitle: reqTitle
 }

@@ -10,6 +10,7 @@ const siteInfo = [
 	}
 ]
 const webSearch = require("./search.js");
+const crawler = require("./crawler.js");
 function searchFun() {
 	nodeInput.question("Input Anime Title:", async ans => {
 		console.log("searching...");
@@ -26,7 +27,8 @@ function selectFun(titleArry, searchResult) {
 	nodeInput.question("Select One(number):", async ans => {
 		process.stdout.write("\b\r");
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
+		console.log(`Try to request html from: ${searchResult[ans]}`);
+		console.log( await crawler.typeOfSite(searchResult[ans]) );
 	});
 };
-
 searchFun();
