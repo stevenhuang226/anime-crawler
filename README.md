@@ -1,6 +1,5 @@
-# The program currently lacks any practical utility and is still in the development phase
+## These scripts can only processed myself-bbs.com
 ## Future features
-- add search support
 - add more web site as source
 ## Runtime Dependencies
 - nodejs
