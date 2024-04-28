@@ -63,12 +63,11 @@ async function reqTitle(urlArry) {
 			};
 			const reqBody = req.request(reqObj, (response) => {
 				let originData = "";
-				let title = `*${index}* `;
 				response.on("data", (data) => {
 					originData += data;
 				})
 				response.on("end", () => {
-					title += originData.match(/<title>(.*?)<\/title>/)[0].replace(/<title>/, "").replace(/<\/title>/, "");
+					let title = originData.match(/<title>(.*?)<\/title>/)[0].replace(/<title>/, "").replace(/<\/title>/, "") || "No Data";
 					resolve(title);
 				})
 			})

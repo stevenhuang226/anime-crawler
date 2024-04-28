@@ -10,10 +10,23 @@ const siteInfo = [
 	}
 ]
 const webSearch = require("./search.js");
-nodeInput.question("Input Anime Title:", async ans => {
-	let searchResult = await webSearch.g_search(ans, siteInfo);
-	let titleArry = await webSearch.reqTitle(searchResult);
-	console.log(searchResult);
-	console.log(titleArry);
-	process.exit(0);
-});
+function searchFun() {
+	nodeInput.question("Input Anime Title:", async ans => {
+		console.log("searching...");
+		let searchResult = await webSearch.g_search(ans, siteInfo);
+		let titleArry = await webSearch.reqTitle(searchResult);
+		process.stdout.write("\b\r");
+		titleArry.forEach( (element, index) => {
+			console.log(`${index} ${element}`);
+		});
+		selectFun(titleArry, searchResult);
+	});
+};
+function selectFun(titleArry, searchResult) {
+	nodeInput.question("Select One(number):", async ans => {
+		process.stdout.write("\b\r");
+		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
+	});
+};
+
+searchFun();
