@@ -47,7 +47,43 @@ async function g_search(keyword, selectSite) {
 		return -1;
 	} );
 }
-
+async function reqTitle(urlArry) {
+	const req = require("https");
+	const url = require("url");
+	let titleArry = [];
+	let promises = [];
+	urlArry.forEach( (element) => {
+		const promise = new Promise( (resolve,reject) => {
+			const reqObj = {
+				hostname: url.parse(element).hostname,
+				path: url.parse(element).path,
+				headers: {
+					"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv; 78.0) Gecko/20100101 Firefox/78.0" 
+				}
+			}
+			const reqBody = req.request(reqObj, (response) => {
+				let originData = "";
+				response.on("data", (data) => {
+					originData += data;
+				})
+				response.on("end", () => {
+					// TODO
+					// resolve(ans);
+				})
+			})
+		})
+		promises.push(promise);
+	})
+	return Promise.all(promises).then( (results) => {
+		results.forEach( (element) => {
+			titleArry.push(elment);
+		} )
+		return titleArry;
+	} ).catch(error, (error) => {
+		console.log("Request Url Title Error:\n",error);
+		return (-1);
+	})
+}
 module.exports = {
 	g_search: g_search
 }
