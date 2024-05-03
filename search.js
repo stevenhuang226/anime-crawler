@@ -88,6 +88,7 @@ async function reqTitle(urlArry) {
 		return (-1);
 	});
 }
+
 module.exports = {
 	g_search: g_search,
 	reqTitle: reqTitle

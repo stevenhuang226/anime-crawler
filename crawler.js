@@ -3,12 +3,19 @@ async function typeOfSite(unknowUrl) {
 		{
 			name: myself,
 			rule: /https:\/\/myself-bbs\.com/
+		},
+		{
+			name: animeOne,
+			rule: /https:\/\/anime1.me\.com/
 		}
 	];
 	let rsp = "";
 	for (const element of siteRule) {
 		if ( element.rule.test(unknowUrl) ) {
 			return await myself(unknowUrl);
+		}
+		else if ( element.rule.test(unknowUrl) ) {
+			return await animeOne(unknowUrl);
 		}
 		else {
 			return ""
@@ -63,6 +70,8 @@ async function myself(theUrl) {
 		return (-1);
 	});
 };
+async function animeOne(theUrl) {
+}
 module.exports = {
 	typeOfSite: typeOfSite
 }
