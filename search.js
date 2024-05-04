@@ -66,9 +66,9 @@ async function reqTitle(urlArry) {
 				response.on("data", (data) => {
 					originData += data;
 				})
-				response.on("end", () => {
-					let title = originData.match(/<title>(.*?)<\/title>/)[0].replace(/<title>/, "").replace(/<\/title>/, "") || "No Data";
-					resolve(title);
+				response.on("end", async () => {
+					let title = await originData.match(/<title>(.*?)<\/title>/) || ["Error No Data"];
+					resolve(title[0].replace(/<title>/, "").replace(/<\/title>/, ""));
 				})
 			})
 			reqBody.on("error", (error) => {
