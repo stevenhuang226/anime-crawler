@@ -147,8 +147,8 @@ async function animeOne(theUrl) {
 		let episodeObj = [{}];
 		for ( let ptr = 0; ptr < urlArry.length; ptr++ ) {
 			episodeObj[ptr] = {title: "Error No Data", url: "Error No Data"};
-			episodeObj[ptr].title = titleArry[ptr];
-			episodeObj[ptr].url = urlArry[ptr];
+			episodeObj[ptr]["title"] = titleArry[ptr];
+			episodeObj[ptr]["url"] = urlArry[ptr];
 		}
 		return episodeObj;
 	} ).catch( (error) => {
