@@ -136,7 +136,7 @@ async function animeOne(theUrl) {
 		return Promise.all(promises).then( (results) => {
 			let resultArry = [];
 			results.forEach( (result) => {
-				resultArry.push(result);
+				resultArry.push("https"+result);
 			} )
 			return resultArry;
 		} ).catch( (error) => {
