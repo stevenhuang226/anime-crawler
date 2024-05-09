@@ -21,6 +21,7 @@ async function typeOfSite(unknowUrl) {
 
 async function mySelf(theUrl) {
 	const https = require("node:https");
+	const http = require("node:http");
 	const url = require("node:url");
 	return new Promise( (resolve,reject) => {
 		const reqObj = {
@@ -56,41 +57,8 @@ async function mySelf(theUrl) {
 		let promises = [];
 		episodeObj.forEach( (element) => {
 			const reqWS = new Promise( (resolve,reject) => {
-				let originData = "";
-				const postData = `{"tid":"","vid":"","id":"${element.playerCode}"}`;
-				console.log(postData);
-				const reqObj = {
-					hostname: "v.myself-bbs.com",
-					path: "/ws",
-					// TODO: need Sec-WebSocket-xxx header
-				};
-				const reqBody = https.request(reqObj);
-				reqBody.on("connect", (response,socket) => {
-					socket.on("data", (data) => {
-						originData += data.toString();
-					});
-					socket.on("end", () => {
-						reqBody.abort();
-					});
-					socket.write(postData);
-					setTimeout ( function() {
-						reqBody.abort();
-						console.log(originData);
-						resolve(originData);
-					}, 1000);
-				});
-				reqBody.on("error", function() {
-					reject(error);
-				});
-				reqBody.on("timeout", function() {
-					reject("Error: timeout");
-				})
-				setTimeout(function () {
-					console.log("timeout");
-					reqBody.abort();
-				}, 2000)
-				reqBody.end();
-			})
+				// TODO WebSocket Connect Here
+			});
 			promises.push(reqWS);
 		});
 		return Promise.all(promises).then( (results) => {
@@ -99,7 +67,7 @@ async function mySelf(theUrl) {
 			}
 			return episodeObj;
 		}).catch( (error) => {
-			reject(error);
+			console.log(error);
 		} )
 	}).catch( (error) => {
 		console.log(error);
