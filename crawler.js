@@ -69,7 +69,6 @@ async function mySelf(theUrl) {
 				socket.onopen = function(open) {
 					if (/play/.test(element.playerCode)) {
 						socket.send(`{"tid":"${element.playerCode.match(/(?<=\/)\d{5}(?=\/)/g)[0]}","vid":"${element.playerCode.match(/(?<=\/)\d{3}/g)[1]}","id":""}`);
-						console.log(`{"tid":"${element.playerCode.match(/(?<=\/)\d{5}(?=\/)/g)[0]}","vid":"${element.playerCode.match(/(?<=\/)\d{3}/g)[1]}","id":""}`);
 					}
 					else {
 						socket.send(`{"tid":"","vid":"","id":"${element.playerCode}"}`);
