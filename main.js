@@ -19,7 +19,7 @@ function searchFun() {
 	nodeInput.question("Input Anime Title:", async ans => {
 		console.log("searching...");
 		let searchResult = await webSearch.g_search(ans, siteInfo);
-		console.log(searchResult);
+		//console.log(searchResult);
 		let titleArry = await webSearch.reqTitle(searchResult);
 		process.stdout.write("\b\r");
 		titleArry.forEach( (element, index) => {

@@ -21,7 +21,7 @@ async function typeOfSite(unknowUrl) {
 
 async function mySelf(theUrl) {
 	const https = require("node:https");
-	//const http = require("node:http");
+	const http = require("node:http");
 	const url = require("node:url");
 	const crypto = require("node:crypto")
 	return new Promise( (resolve,reject) => {
@@ -58,36 +58,23 @@ async function mySelf(theUrl) {
 		let promises = [];
 		episodeObj.forEach( (element) => {
 			const reqWS = new Promise( (resolve,reject) => {
-				let postData = `{"tid":"45030","vid":"001","id":"${element.playerCode}"}`
-				const HreqObj = {
-					hostname: "v.myself-bbs.com",
-					path: "/ws",
-					method: "GET",
-					family: 4,
-					headers: {
-						"Upgrade": "websocket",
-						"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv; 78.0) Gecko/20100101 Firefox/78.0",
-						"Sec-Fetch-Mode": "websocket",
-						"Connection": "keep-alive, Upgrade",
-						"Sec-WebSocket-Key": "XJgNm32wxzypGLNjQ82CXA==",
-					},
+				let postData = `{"tid":"","vid":"","id":"${element.playerCode}"}`;
+				let socket = new WebSocket("wss://v.myself-bbs.com/ws");
+				socket.onopen = function(open) {
+					console.log("socket opened"); //debug
+					socket.send(postData);
 				};
-				const reqBody = https.request(HreqObj, (response) => {
-					let originData = "";
-					const socket = new WebSocket("wss://v.myself-bbs.com/ws");
-					//TODO figure out WTF is web socket;
-				});
+				socket.onmessage = (event) => {
+					console.log(event.data);
+				};
+				socket.onerror = (error) => {
+					console.log(error);
+				}
 				setTimeout( () => {
-					console.log("https setTimeout");
-					reqBody.destroy();
-				}, 2000 )
-				reqBody.on("error", (error) => {
-					reject(error);
-				});
-				reqBody.on("timeout", () => {
-					console.log("https timeout");
-				});
-				reqBody.end();
+					console.log("socket closing"); //debug
+					socket.close(1000, "");
+					console.log(socket.readyState); //debug
+				}, 3000);
 			});
 			promises.push(reqWS);
 		});
