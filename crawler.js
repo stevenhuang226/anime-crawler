@@ -85,7 +85,7 @@ async function mySelf(theUrl) {
 					if ( socket.readyState != 3 ) {
 						reject("Error Web Socket not closing");
 					}
-					resolve(originData.match(/(?<="video":")\/\/.+?(?=")/g));
+					resolve(originData.match(/(?<="video":"\/\/).+?(?=")/g)[0]);
 				}, 3000);
 			});
 			promises.push(reqWS);

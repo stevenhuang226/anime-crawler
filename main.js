@@ -33,8 +33,52 @@ function selectFun(titleArry, searchResult) {
 		process.stdout.write("\b\r");
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
-		console.log( await crawler.typeOfSite(searchResult[ans]) );
-		process.exit(0);
+		let episodeObj = await crawler.typeOfSite(searchResult[ans]);
+		console.log(episodeObj);
+		await myselfDownload(episodeObj[0].url);
 	});
 };
 searchFun();
+
+async function myselfDownload(theUrl) {
+	const https = require("https");
+	const url = require("url");
+	const agent = https.Agent({
+		keepAlive: true,
+	})
+	const reqObj = {
+		hostname: theUrl.match(/.+\.myself-bbs\.com/)[0],
+		path: theUrl.match(/(?<=.+\.myself-bbs\.com).+\.m3u8/)[0],
+		method: "GET",
+		family: 4,
+		agent: agent,
+		headers: {
+			"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+			"Accept": "*/*",
+			"Accept-Language": "en-US,en;q=0.5",
+			"Referer": "https://v.myself-bbs.com/",
+			"Origin": "https://v.myself-bbs.com",
+			"Connection": "keep-alive",
+			"Sec-Fetch-Dest": "empty",
+			"Sec-Fetch-Mode": "no-cors",
+			"Sec-Fetch-Site": "same-site",
+			"Pragma": "no-cache",
+			"Cache-Control": "no-cache",
+		}
+	};
+	console.log(reqObj);
+	const reqBody = https.request(reqObj, (res) => {
+		console.log(res.statusCode);
+		originData = "";
+		res.on("data", (data) => {
+			originData += data;
+		});
+		res.on("end", () => {
+			console.log(originData);
+		});
+	});
+	reqBody.on("error", (error) => {
+		console.log(error);
+	});
+	reqBody.end();
+}
