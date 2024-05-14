@@ -15,11 +15,11 @@ const siteInfo = [
 ]
 const webSearch = require("./search.js");
 const crawler = require("./crawler.js");
+const downloader = require("./download.js")
 function searchFun() {
 	nodeInput.question("Input Anime Title:", async ans => {
 		console.log("searching...");
 		let searchResult = await webSearch.g_search(ans, siteInfo);
-		//console.log(searchResult);
 		let titleArry = await webSearch.reqTitle(searchResult);
 		process.stdout.write("\b\r");
 		titleArry.forEach( (element, index) => {
@@ -33,52 +33,18 @@ function selectFun(titleArry, searchResult) {
 		process.stdout.write("\b\r");
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
-		let episodeObj = await crawler.typeOfSite(searchResult[ans]);
-		console.log(episodeObj);
-		await myselfDownload(episodeObj[0].url);
+		const [episodeObj, siteType] = await crawler.typeOfSite(searchResult[ans]);
+		episodeObj.forEach( (element, index) => {
+			console.log(`title: ${element.title}\nurl:${element.url}\n----------`)
+		})
+	});
+};
+function downloadFun(episodeObj, siteType) {
+	nodeInput.question("input a arry to download(1,2,3...)\nor input 'n' to quit script", async ans => {
+		if ( ans == ["n","N","not","Not","NOT"] ) {
+			console.log("quit...");
+			process.exit(0);
+		}
 	});
 };
 searchFun();
-
-async function myselfDownload(theUrl) {
-	const https = require("https");
-	const url = require("url");
-	const agent = https.Agent({
-		keepAlive: true,
-	})
-	const reqObj = {
-		hostname: theUrl.match(/.+\.myself-bbs\.com/)[0],
-		path: theUrl.match(/(?<=.+\.myself-bbs\.com).+\.m3u8/)[0],
-		method: "GET",
-		family: 4,
-		agent: agent,
-		headers: {
-			"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
-			"Accept": "*/*",
-			"Accept-Language": "en-US,en;q=0.5",
-			"Referer": "https://v.myself-bbs.com/",
-			"Origin": "https://v.myself-bbs.com",
-			"Connection": "keep-alive",
-			"Sec-Fetch-Dest": "empty",
-			"Sec-Fetch-Mode": "no-cors",
-			"Sec-Fetch-Site": "same-site",
-			"Pragma": "no-cache",
-			"Cache-Control": "no-cache",
-		}
-	};
-	console.log(reqObj);
-	const reqBody = https.request(reqObj, (res) => {
-		console.log(res.statusCode);
-		originData = "";
-		res.on("data", (data) => {
-			originData += data;
-		});
-		res.on("end", () => {
-			console.log(originData);
-		});
-	});
-	reqBody.on("error", (error) => {
-		console.log(error);
-	});
-	reqBody.end();
-}

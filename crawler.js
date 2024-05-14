@@ -2,25 +2,26 @@ async function typeOfSite(unknowUrl) {
 	const siteRule = [
 		{
 			function: mySelf,
+			name: "mySelf",
 			rule: /https:\/\/myself-bbs\.com/
 		},
 		{
 			function: animeOne,
+			name: "animeOne",
 			rule: /https:\/\/anime1\.me/
 		},
 	];
 	for ( let element of siteRule ) {
 		if ( element.rule.test(unknowUrl) ) {
-			return await element.function(unknowUrl);
+			return await element.function(unknowUrl, element.name);
 		}
 	}
 	console.log("Error Unknow Url Type");
 	return -1;
 };
 
-async function mySelf(theUrl) {
+async function mySelf(theUrl, siteType) {
 	const https = require("node:https");
-	const http = require("node:http");
 	const url = require("node:url");
 	const crypto = require("node:crypto")
 	return new Promise( (resolve,reject) => {
@@ -57,14 +58,19 @@ async function mySelf(theUrl) {
 		let promises = [];
 		episodeObj.forEach( (element) => {
 			const reqWS = new Promise( (resolve,reject) => {
-				console.log(element);
-				if (/play/.test(element.playerCode)) {
-					let postData = `{"tid":"${element.playerCode.match(/\/(\d{5})\//g)[0]}","vid":"${element.playerCode.match(/\/(\d{3})\//)}","id":""}`;
-				}
-				else {
-					let postData = `{"tid":"","vid":"","id":"${element.playerCode}"}`;
-				}
 				let socket = new WebSocket("wss://v.myself-bbs.com/ws");
+				const socketTimeout = setTimeout( () => {
+					socket.close(1000,"");
+					setTimeout( () => {
+						if ( socket.readyState != 3 ) {
+							socket.close(1000, "");
+							reject("Error Web Socket Not Close");
+						}
+						else {
+							resolve("https:" + originData.match(/(?<="video":").+?(?=")/g)[0]);
+						}
+					}, 200)
+				}, 10000); // socket time out value(default = 10s(10000));
 				let originData = "";
 				socket.onopen = function(open) {
 					if (/play/.test(element.playerCode)) {
@@ -76,17 +82,23 @@ async function mySelf(theUrl) {
 				};
 				socket.onmessage = (event) => {
 					originData += event.data;
+					if ( /(?<="video":").+?(?=")/.test(originData) ) {
+						clearTimeout(socketTimeout);
+						socket.close(1000, "");
+						setTimeout( () => {
+							if ( socket.readyState != 3 ) {
+								socket.close(1000, "");
+								reject("Error Web Socket Not Close(onmessage)");
+							}
+							else {
+								resolve("https:" + originData.match(/(?<="video":").+?(?=")/g)[0]);
+							}
+						}, 200)
+					}
 				};
 				socket.onerror = (error) => {
 					reject(error);
-				}
-				setTimeout( () => {
-					socket.close(1000, "");
-					if ( socket.readyState != 3 ) {
-						reject("Error Web Socket not closing");
-					}
-					resolve(originData.match(/(?<="video":"\/\/).+?(?=")/g)[0]);
-				}, 3000);
+				};
 			});
 			promises.push(reqWS);
 		});
@@ -94,15 +106,17 @@ async function mySelf(theUrl) {
 			for ( let ptr = 0; ptr < episodeObj.length; ptr++ ) {
 				episodeObj[ptr].url = results[ptr];
 			}
-			return episodeObj;
+			return [episodeObj, siteType];
 		}).catch( (error) => {
 			console.log(error);
+			return -1;
 		} )
 	}).catch( (error) => {
 		console.log(error);
+		return -1;
 	});
 }
-async function animeOne(theUrl) {
+async function animeOne(theUrl, siteType) {
 	const https = require("https");
 	const url = require("url");
 	let titleArry = [];
@@ -197,7 +211,7 @@ async function animeOne(theUrl) {
 			episodeObj[ptr]["title"] = titleArry[ptr];
 			episodeObj[ptr]["url"] = urlArry[ptr];
 		}
-		return episodeObj;
+		return [episodeObj, siteType];
 	} ).catch( (error) => {
 		console.log("Error request anime1 url", error);
 		return -1;
