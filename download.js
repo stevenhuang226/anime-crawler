@@ -38,3 +38,23 @@ async function myselfDownload(theUrl) {
 	});
 	reqBody.end();
 }
+
+async function typeOfDownload(theUrl, siteType, fileName) {
+	const siteRule = [
+		{
+			function: mySelf,
+			rule: /mySelf/
+		},
+		{
+			function: animeOne,
+			rule: /animeOne/
+		},
+	];
+	for ( let element of siteRule ) {
+		if (element.rule.test(siteType) ) {
+			return await element.function(theUrl, fileName);
+		}
+	}
+	console.log("Error Unknow Site Type");
+	return -1;
+}

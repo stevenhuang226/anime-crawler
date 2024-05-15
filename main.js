@@ -39,11 +39,28 @@ function selectFun(titleArry, searchResult) {
 		})
 	});
 };
+async function askFileName(title) {
+	nodeInput.question(`input file name for ${title} :`, ans => {
+		return ans;
+	})
+}
 function downloadFun(episodeObj, siteType) {
 	nodeInput.question("input a arry to download(1,2,3...)\nor input 'n' to quit script", async ans => {
 		if ( ans == ["n","N","not","Not","NOT"] ) {
 			console.log("quit...");
 			process.exit(0);
+		}
+		else {
+			const selectArry = ans.split(/\s*,\s*/).map(Number);
+			for ( let element in selectArry ) {
+				if ( element <= episodeObj.length && element >= 0 ) {
+					let fileName = await askFileName(episodeObj[element].title);
+					await downloader.typeOfDownload(episodeObj[element].url, siteType, fileName);
+				}
+				esle {
+					console.log(`input out of index ignored:${element}`);
+				}
+			}
 		}
 	});
 };
