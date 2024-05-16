@@ -35,32 +35,24 @@ function selectFun(titleArry, searchResult) {
 		console.log(`Try to request html from: ${searchResult[ans]}`);
 		const [episodeObj, siteType] = await crawler.typeOfSite(searchResult[ans]);
 		episodeObj.forEach( (element, index) => {
-			console.log(`title: ${element.title}\nurl:${element.url}\n----------`)
+			console.log("code: %d\n  title: %s\n  url: %s\n-----end-----\n", index, element.title, element.url);
 		})
+		downloadFun(episodeObj, siteType);
 	});
 };
-async function askFileName(title) {
-	nodeInput.question(`input file name for ${title} :`, ans => {
-		return ans;
-	})
-}
 function downloadFun(episodeObj, siteType) {
-	nodeInput.question("input a arry to download(1,2,3...)\nor input 'n' to quit script", async ans => {
-		if ( ans == ["n","N","not","Not","NOT"] ) {
-			console.log("quit...");
+	nodeInput.question("input structure index:fileName, index:fileName...\nor input 'n' to quit script:", async ans => {
+		if (["n","N","not","Not","NOT"].includes(ans) ) {
+			console.log("quit");
 			process.exit(0);
 		}
 		else {
-			const selectArry = ans.split(/\s*,\s*/).map(Number);
-			for ( let element in selectArry ) {
-				if ( element <= episodeObj.length && element >= 0 ) {
-					let fileName = await askFileName(episodeObj[element].title);
-					await downloader.typeOfDownload(episodeObj[element].url, siteType, fileName);
-				}
-				esle {
-					console.log(`input out of index ignored:${element}`);
-				}
-			}
+			const selectArry = ans.split(/\s*,\s*/);
+			let downloadStruct = [];
+			selectArry.forEach( (element,index) => {
+				let [num, fileName] = element.split(/\s*:\s*/);
+				downloadStruct.push({ep: +num, fileName: fileName});
+			});
 		}
 	});
 };

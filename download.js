@@ -1,4 +1,4 @@
-async function myselfDownload(theUrl) {
+/*async function myselfDownload(theUrl) {
 	const https = require("https");
 	const url = require("url");
 	const reqObj = {
@@ -10,7 +10,6 @@ async function myselfDownload(theUrl) {
 		family: 4,
 		headers: {
 			"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
-			"Accept": "*/*",
 			"Accept-Language": "en-US,en;q=0.5",
 			"Referer": "https://v.myself-bbs.com/",
 			"Origin": "https://v.myself-bbs.com",
@@ -37,7 +36,7 @@ async function myselfDownload(theUrl) {
 		console.log(error);
 	});
 	reqBody.end();
-}
+}*/
 
 async function typeOfDownload(theUrl, siteType, fileName) {
 	const siteRule = [
@@ -45,10 +44,10 @@ async function typeOfDownload(theUrl, siteType, fileName) {
 			function: mySelf,
 			rule: /mySelf/
 		},
-		{
+		/*{
 			function: animeOne,
 			rule: /animeOne/
-		},
+		},*/
 	];
 	for ( let element of siteRule ) {
 		if (element.rule.test(siteType) ) {
@@ -68,17 +67,9 @@ async function mySelf(theUrl, fileName) {
 			method: "GET",
 			headers: {
 				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
-				"Accept": "*/*",
-				"Accept-Language": "en-US,en;q=0.5",
 				"Referer": "https://v.myself-bbs.com/",
 				"Origin": "https://v.myself-bbs.com",
-				"Connection": "keep-alive",
-				"Sec-Fetch-Dest": "empty",
-				"Sec-Fetch-Mode": "no-cors",
-				"Sec-Fetch-Site": "same-site",
-				"Pragma": "no-cache",
-				"Cache-Control": "no-cache",
-			};
+			},
 		};
 		const reqBody = https.request(reqObj, (response) => {
 			let originData = "";
@@ -93,9 +84,14 @@ async function mySelf(theUrl, fileName) {
 			reject(error);
 		});
 		reqBody.end();
-	}).then( (m3u8Url) => {
+	}).then( (m3u8Data) => {
+		console.log(m3u8Data); //debug
+		return 0;
 		//TODO parse m3u8 file
 	}).catch( (error) => {
 		console.log(error);
 	} )
+}
+module.exports = {
+	typeOfDownload: typeOfDownload,
 }
