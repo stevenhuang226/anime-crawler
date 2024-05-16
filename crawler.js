@@ -124,6 +124,7 @@ async function animeOne(theUrl, siteType) {
 		const reqObj = {
 			hostname: url.parse(theUrl).hostname,
 			path: url.parse(theUrl).path,
+			method: "GET",
 			header: {
 				"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv; 78.0) Gecko/20100101 Firefox/78.0"
 			}

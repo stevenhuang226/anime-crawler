@@ -41,17 +41,24 @@ function selectFun(titleArry, searchResult) {
 	});
 };
 function downloadFun(episodeObj, siteType) {
-	nodeInput.question("input structure index:fileName, index:fileName...\nor input 'n' to quit script:", async ans => {
+	nodeInput.question("input structure code:path, code:path ...\nor input 'n' to quit script:", async ans => {
 		if (["n","N","not","Not","NOT"].includes(ans) ) {
 			console.log("quit");
 			process.exit(0);
 		}
 		else {
-			const selectArry = ans.split(/\s*,\s*/);
-			let downloadStruct = [];
-			selectArry.forEach( (element,index) => {
-				let [num, fileName] = element.split(/\s*:\s*/);
-				downloadStruct.push({ep: +num, fileName: fileName});
+			return new Promise( (resolve) => {
+				const selectArry = ans.split(/\s*,\s*/);
+				let downloadStruct = [];
+				selectArry.forEach( (element,index) => {
+					let [num, fileName] = element.split(/\s*:\s*/);
+					downloadStruct.push({ep: +num, fileName: fileName});
+				});
+				resolve(downloadStruct);
+			}).then( async (downloadStruct) => {
+				for ( let element of downloadStruct ) {
+					await downloader.typeOfDownload(episodeObj[element.ep].url, siteType, element.fileName);
+				}
 			});
 		}
 	});

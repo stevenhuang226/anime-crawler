@@ -60,6 +60,10 @@ async function typeOfDownload(theUrl, siteType, fileName) {
 async function mySelf(theUrl, fileName) {
 	const https = require("https");
 	const url = require("url");
+	const fs = require("fs");
+	const urlHostname = url.parse(theUrl).hostname;
+	const urlPathHeader = theUrl.match(/(?<=com)\/.+\//g)[0];
+	console.log("host: ", urlHostname, "path: ", urlPathHeader);
 	return new Promise( (resolve,reject) => {
 		const reqObj = {
 			hostname: url.parse(theUrl).hostname,
@@ -84,10 +88,44 @@ async function mySelf(theUrl, fileName) {
 			reject(error);
 		});
 		reqBody.end();
-	}).then( (m3u8Data) => {
+	}).then( async (m3u8Data) => {
 		console.log(m3u8Data); //debug
+		const m3u8Arry = m3u8Data.match(/(?<=\n).+\.ts/g);
+		console.log(m3u8Arry); //debug
+		const streamFile = fs.createWriteStream(fileName); //dangerous
+		for ( let element of m3u8Arry ) {
+			await new Promise( (resolve,reject) => {
+				const reqObj = {
+					hostname: urlHostname,
+					path: urlPathHeader + element,
+					method: "GET",
+					headers: {
+						"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+						"Referer": "https://v.myself-bbs.com/",
+						"Origin": "https://v.myself-bbs.com",
+					},
+				};
+				console.log(reqObj);
+				//TODO download & save dot ts file
+				/*()
+				const reqBody = https.request(reqObj, (response) => {
+					if ( response.statusCode !== 200 ) {
+						reject(new Error(`failed request ${reqObj.hostname}${reqObj.path}`));
+					}
+					response.pipe(streamFile, {end: false});
+					response.on("end", () => {
+						resolve();
+					})
+				});
+				reqBody.on("error", (error) => {
+					reject(error);
+				});
+				reqBody.end();
+				*/ //dangerous
+			});
+		}
+		streamFile.end(); //dangerous
 		return 0;
-		//TODO parse m3u8 file
 	}).catch( (error) => {
 		console.log(error);
 	} )
