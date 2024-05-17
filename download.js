@@ -89,10 +89,10 @@ async function mySelf(theUrl, fileName) {
 		});
 		reqBody.end();
 	}).then( async (m3u8Data) => {
-		console.log(m3u8Data); //debug
 		const m3u8Arry = m3u8Data.match(/(?<=\n).+\.ts/g);
-		console.log(m3u8Arry); //debug
-		const streamFile = fs.createWriteStream(fileName); //dangerous
+		const lastOneTs = m3u8Arry[m3u8Arry.length - 1];
+		
+		const streamFile = fs.createWriteStream(fileName);
 		for ( let element of m3u8Arry ) {
 			await new Promise( (resolve,reject) => {
 				const reqObj = {
@@ -105,9 +105,7 @@ async function mySelf(theUrl, fileName) {
 						"Origin": "https://v.myself-bbs.com",
 					},
 				};
-				console.log(reqObj);
-				//TODO download & save dot ts file
-				/*()
+				console.log("%s/%s", element,lastOneTs);
 				const reqBody = https.request(reqObj, (response) => {
 					if ( response.statusCode !== 200 ) {
 						reject(new Error(`failed request ${reqObj.hostname}${reqObj.path}`));
@@ -121,10 +119,11 @@ async function mySelf(theUrl, fileName) {
 					reject(error);
 				});
 				reqBody.end();
-				*/ //dangerous
+				process.stdout.write("\b\r");
 			});
 		}
-		streamFile.end(); //dangerous
+		streamFile.end();
+		console.log("%s downloaded", fileName);
 		return 0;
 	}).catch( (error) => {
 		console.log(error);

@@ -13,14 +13,14 @@ async function typeOfSite(unknowUrl) {
 	];
 	for ( let element of siteRule ) {
 		if ( element.rule.test(unknowUrl) ) {
-			return await element.function(unknowUrl, element.name);
+			return [ await element.function(unknowUrl), element.name];
 		}
 	}
 	console.log("Error Unknow Url Type");
 	return -1;
 };
 
-async function mySelf(theUrl, siteType) {
+async function mySelf(theUrl) {
 	const https = require("node:https");
 	const url = require("node:url");
 	const crypto = require("node:crypto")
@@ -106,7 +106,7 @@ async function mySelf(theUrl, siteType) {
 			for ( let ptr = 0; ptr < episodeObj.length; ptr++ ) {
 				episodeObj[ptr].url = results[ptr];
 			}
-			return [episodeObj, siteType];
+			return episodeObj;
 		}).catch( (error) => {
 			console.log(error);
 			return -1;
@@ -116,7 +116,7 @@ async function mySelf(theUrl, siteType) {
 		return -1;
 	});
 }
-async function animeOne(theUrl, siteType) {
+async function animeOne(theUrl) {
 	const https = require("https");
 	const url = require("url");
 	let titleArry = [];
@@ -212,7 +212,7 @@ async function animeOne(theUrl, siteType) {
 			episodeObj[ptr]["title"] = titleArry[ptr];
 			episodeObj[ptr]["url"] = urlArry[ptr];
 		}
-		return [episodeObj, siteType];
+		return episodeObj;
 	} ).catch( (error) => {
 		console.log("Error request anime1 url", error);
 		return -1;

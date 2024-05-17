@@ -34,8 +34,9 @@ function selectFun(titleArry, searchResult) {
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
 		const [episodeObj, siteType] = await crawler.typeOfSite(searchResult[ans]);
+		console.log("siteType:",siteType); //debug
 		episodeObj.forEach( (element, index) => {
-			console.log("code: %d\n  title: %s\n  url: %s\n-----end-----\n", index, element.title, element.url);
+			console.log("code: %d\n  title: %s\n  url: %s\n-----end-----\n", index+1, element.title, element.url);
 		})
 		downloadFun(episodeObj, siteType);
 	});
@@ -52,13 +53,14 @@ function downloadFun(episodeObj, siteType) {
 				let downloadStruct = [];
 				selectArry.forEach( (element,index) => {
 					let [num, fileName] = element.split(/\s*:\s*/);
-					downloadStruct.push({ep: +num, fileName: fileName});
+					downloadStruct.push({ep: (+num)-1, fileName: fileName});
 				});
 				resolve(downloadStruct);
 			}).then( async (downloadStruct) => {
 				for ( let element of downloadStruct ) {
 					await downloader.typeOfDownload(episodeObj[element.ep].url, siteType, element.fileName);
 				}
+				process.exit(0);// problem here
 			});
 		}
 	});
