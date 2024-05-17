@@ -34,7 +34,6 @@ function selectFun(titleArry, searchResult) {
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
 		const [episodeObj, siteType] = await crawler.typeOfSite(searchResult[ans]);
-		console.log("siteType:",siteType); //debug
 		episodeObj.forEach( (element, index) => {
 			console.log("code: %d\n  title: %s\n  url: %s\n-----end-----\n", index+1, element.title, element.url);
 		})
@@ -42,7 +41,7 @@ function selectFun(titleArry, searchResult) {
 	});
 };
 function downloadFun(episodeObj, siteType) {
-	nodeInput.question("input structure code:path, code:path ...\nor input 'n' to quit script:", async ans => {
+	nodeInput.question("input structure code:path, code:path ...\nor input 'n' to quit script\n==>", async ans => {
 		if (["n","N","not","Not","NOT"].includes(ans) ) {
 			console.log("quit");
 			process.exit(0);

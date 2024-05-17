@@ -23,7 +23,6 @@ async function mySelf(theUrl, fileName) {
 	const fs = require("fs");
 	const urlHostname = url.parse(theUrl).hostname;
 	const urlPathHeader = theUrl.match(/(?<=com)\/.+\//g)[0];
-	console.log("host: ", urlHostname, "path: ", urlPathHeader);
 	return new Promise( (resolve,reject) => {
 		const reqObj = {
 			hostname: url.parse(theUrl).hostname,
