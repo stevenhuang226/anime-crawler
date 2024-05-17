@@ -7,13 +7,13 @@ git clone https://github.com/stevenhuang226/anime-crawler.git
 ```
 node --experimental-websocket main.js
 ```
-![pic1](src/pic1.png)
 - 輸入要搜尋的動漫名稱
-![pic2](src/pic2.png)
+![pic1](src/pic1.png)
 - 選擇一個片源
-![pic3](src/pic3.png)
+![pic2](src/pic2.png)
 - 輸入要下載的集數的代碼，冒號，路徑（絕對路徑）並且使用逗號分隔
 - 或是輸入 " n " 取消下載
+![pic3](src/pic3.png)
 ```
 {code}:{path}, {code}:{path}
 ```
