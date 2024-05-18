@@ -17,5 +17,8 @@ node --experimental-websocket main.js
 ```
 {code}:{path}, {code}:{path}
 ```
+## 支援的網站
+1. myself-bbs.com(support download)
+2. anime1.me(support download)
 ## 依賴
 - nodejs v20 or later
