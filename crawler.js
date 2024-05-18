@@ -54,63 +54,62 @@ async function mySelf(theUrl) {
 			reject(error);
 		});
 		reqBody.end();
-	}).then( (episodeObj) => {
-		let promises = [];
-		episodeObj.forEach( (element) => {
-			const reqWS = new Promise( (resolve,reject) => {
-				let socket = new WebSocket("wss://v.myself-bbs.com/ws");
-				const socketTimeout = setTimeout( () => {
-					socket.close(1000,"");
-					setTimeout( () => {
-						if ( socket.readyState != 3 ) {
-							socket.close(1000, "");
-							reject("Error Web Socket Not Close");
-						}
-						else {
-							resolve("https:" + originData.match(/(?<="video":").+?(?=")/g)[0]);
-						}
-					}, 200)
-				}, 10000); // socket time out value(default = 10s(10000));
-				let originData = "";
-				socket.onopen = function(open) {
-					if (/play/.test(element.playerCode)) {
-						socket.send(`{"tid":"${element.playerCode.match(/(?<=\/)\d{5}(?=\/)/g)[0]}","vid":"${element.playerCode.match(/(?<=\/)\d{3}/g)[1]}","id":""}`);
-					}
-					else {
-						socket.send(`{"tid":"","vid":"","id":"${element.playerCode}"}`);
-					}
-				};
-				socket.onmessage = (event) => {
-					originData += event.data;
-					if ( /(?<="video":").+?(?=")/.test(originData) ) {
-						clearTimeout(socketTimeout);
-						socket.close(1000, "");
+	}).then( async (episodeObj) => {
+		let runTimes = parseInt(episodeObj.length / 12) + parseInt(11/episodeObj.length);
+		for ( let runtime = 0; runtime < runTimes; runtime++ ) {
+			let promises = [];
+			episodeObj.slice(12*runtime, 12*(runtime+1)).forEach( (element,index) => {
+				const promise = new Promise( (resolve,reject) => {
+					const socket = new WebSocket("wss://v.myself-bbs.com/ws");
+					const socketTimer = setTimeout( () => {
+						socket.close(1000,"");
 						setTimeout( () => {
-							if ( socket.readyState != 3 ) {
-								socket.close(1000, "");
-								reject("Error Web Socket Not Close(onmessage)");
+							if ( socket.readyState !== 3 ) {
+								socket.close(1000,"");
+								reject("Erro web socket not close");
 							}
 							else {
-								resolve("https:" + originData.match(/(?<="video":").+?(?=")/g)[0]);
-							}
-						}, 200)
-					}
-				};
-				socket.onerror = (error) => {
-					reject(error);
-				};
+								episodeObj[ runtime*12 + index ].url = "https:" + originData.match(/(?<="video":").+?(?=")/g)[0];
+								resolve();
+							};
+						}, 200);
+					}, 10000);
+					socket.onopen = (open) => {
+						if ( /play/.test(element.playerCode) ) {
+							socket.send(`{"tid":"${element.playerCode.match(/(?<=\/)\d{5}(?=\/)/g)[0]}","vid":"${element.playerCode.match(/(?<=\/)\d{3}/g)[1]}","id":""}`);
+						}
+						else {
+							socket.send(`{"tid":"","vid":"","id":"${element.playerCode}"}`);
+						}
+					};
+					let originData = "";
+					socket.onmessage = (event) => {
+						originData += event.data;
+						if ( /(?<="video":").+?(?=")/.test(originData) ) {
+							clearTimeout(socketTimer);
+							socket.close(1000,"");
+							setTimeout( () => {
+								if ( socket.readyState !== 3 ) {
+									socket.close(1000,"");
+									reject("Error web socket not close");
+								}
+								else {
+									episodeObj[ runtime*12 + index ].url = "https:" + originData.match(/(?<="video":").+?(?=")/g)[0];
+									resolve();
+								}
+							}, 200)
+						};
+					};
+					socket.onerror = (error) => {
+						console.log("web socket");
+						reject(error);
+					};
+				});
+				promises.push(promise);
 			});
-			promises.push(reqWS);
-		});
-		return Promise.all(promises).then( (results) => {
-			for ( let ptr = 0; ptr < episodeObj.length; ptr++ ) {
-				episodeObj[ptr].url = results[ptr];
-			}
-			return episodeObj;
-		}).catch( (error) => {
-			console.log(error);
-			return -1;
-		} )
+			await Promise.all(promises);
+		}
+		return episodeObj;
 	}).catch( (error) => {
 		console.log(error);
 		return -1;
@@ -136,14 +135,10 @@ async function animeOne(theUrl) {
 				originData += data;
 			})
 			response.on("end", async () => {
-				let matchList = await originData.match(/data-apireq="[^"].*?"/g) || ["Error No Data"];
-				let titles = await originData.match(/rel="bookmark">[^<].*?<\/a>/g) || ["Error No Data"];
-				if ( matchList.length != titles.length ) {
+				let apireqList = await originData.match(/(?<=data-apireq=")[^"].*?(?=")/g) || ["Error No Data"];
+				titleArry = await originData.match(/(?<=rel="bookmark">)[^<].*?(?=<\/a>)/g) || ["Error No Data"];
+				if ( apireqList.length != titleArry.length ) {
 					console.log("Error anime1 crawler: miss anime url or title");
-				}
-				for ( let ptr = 0; ptr < matchList.length; ptr++ ) {
-					apireqList[ptr] = matchList[ptr].replace(/data-apireq="/, "").replace(/"/, "");
-					titleArry[ptr] = titles[ptr].replace(/rel="bookmark">/, "").replace(/<\/a>/, "");
 				}
 				resolve(apireqList);
 			})
@@ -183,8 +178,10 @@ async function animeOne(theUrl) {
 						originData += data;
 					})
 					response.on("end", () => {
-						let matchArry = originData.match(/src":"[^,].*?"/g) || ["Error No Data"];
-						resolve(matchArry[0].replace(/src":"/, "").replace(/"/, ""));
+						let matchArry = originData.match(/(?<=src":")[^,].*?(?=")/g) || ["Error No Data"];
+						let originCookie = response.headers["set-cookie"];
+						let cookie = originCookie[0].match(/e=\d+?;/g)[0] + " " + originCookie[1].match(/p=.+?;/g)[0] + " " + originCookie[2].match(/h=.+?(?=;)/g)[0];
+						resolve([matchArry[0], cookie]);
 					})
 				})
 				reqBody.on("error", (error) => {
@@ -197,20 +194,23 @@ async function animeOne(theUrl) {
 		})
 		return Promise.all(promises).then( (results) => {
 			let resultArry = [];
-			results.forEach( (result) => {
-				resultArry.push("https:"+result);
+			let cookieArry = [];
+			results.forEach( ([retUrl, cookie]) => {
+				resultArry.push("https:"+retUrl);
+				cookieArry.push(cookie);
 			} )
-			return resultArry;
+			return [resultArry, cookieArry];
 		} ).catch( (error) => {
 			console.log("Error request api url\n",error);
 			return -1;
 		} );
-	} ).then( (urlArry) => {
+	} ).then( ([urlArry,cookieArry]) => {
 		let episodeObj = [{}];
 		for ( let ptr = 0; ptr < urlArry.length; ptr++ ) {
-			episodeObj[ptr] = {title: "Error No Data", url: "Error No Data"};
+			episodeObj[ptr] = {title: "Error No Data", url: "Error No Data", cookie: "Error No Data"};
 			episodeObj[ptr]["title"] = titleArry[ptr];
 			episodeObj[ptr]["url"] = urlArry[ptr];
+			episodeObj[ptr]["cookie"] = cookieArry[ptr];
 		}
 		return episodeObj;
 	} ).catch( (error) => {
