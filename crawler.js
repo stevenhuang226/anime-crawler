@@ -216,6 +216,7 @@ async function animeOne(theUrl) {
 			episodeObj[ptr]["url"] = urlArry[ptr];
 			episodeObj[ptr]["cookie"] = cookieArry[ptr];
 		}
+		episodeObj.reverse();
 		return episodeObj;
 	} ).catch( (error) => {
 		console.log("Error request anime1 url", error);
