@@ -41,11 +41,15 @@ async function mySelf(theUrl) {
 			})
 			response.on("end", async () => {
 				let episodeObj = [];
-				let ret = await originData.match(/[\s\S]{100}myself-bbs.com\/player\/.*/g) || ["Error No Data"];
-				for ( let ptr = 0; ptr < ret.length; ptr++ ) {
+				const playerCodeArry = originData.match(/(?<=myself-bbs\.com\/player\/).+/g) || ["Error No Data"];
+				const titleArry = originData.match(/(?<=<a href="javascript:;">).+?(?=<\/a>)/g) || ["Error No Data"];
+				if ( playerCodeArry.length !== titleArry.length ) {
+					console.log("Error myself crawler: miss anime url or title");
+				}
+				for ( let ptr = 0; ptr < playerCodeArry.length; ptr++ ) {
 					episodeObj[ptr] = {title: "Error No Data", url: "Error No Data", playerCode: null};
-					episodeObj[ptr].title = ret[ptr].match(/(?<=javascript:;">).*(?=<\/a>)/g)[0];
-					episodeObj[ptr].playerCode = ret[ptr].match(/(?<=myself-bbs\.com\/player\/).*/g)[0];
+					episodeObj[ptr].title = titleArry[ptr];
+					episodeObj[ptr].playerCode = playerCodeArry[ptr];
 				}
 				resolve(episodeObj);
 			});
