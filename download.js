@@ -91,7 +91,6 @@ async function mySelf(epObj, fileName) {
 	} )
 }
 async function animeOne(epObj, fileName) {
-	console.log(epObj);
 	const https = require("https");
 	const fs = require("fs");
 	const url = require("url");
