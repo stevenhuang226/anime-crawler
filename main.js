@@ -31,6 +31,9 @@ function searchFun() {
 function selectFun(titleArry, searchResult) {
 	nodeInput.question("Select One(number):", async ans => {
 		process.stdout.write("\b\r");
+		if ( ['quit','q','n','not'].includes(ans) ) {
+			process.exit(0);
+		}
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
 		const [episodeObj, siteType] = await crawler.typeOfSite(searchResult[ans]);
