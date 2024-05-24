@@ -18,6 +18,9 @@ node --experimental-websocket main.js
 ```
 {code}:{path}, {code}:{path}
 ```
+```
+all:{/path/to/folder/}
+```
 ## 支援的網站
 1. myself-bbs.com(support download)
 2. anime1.me(support download)
