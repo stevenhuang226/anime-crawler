@@ -42,10 +42,25 @@ function selectFun(titleArry, searchResult) {
 	});
 };
 function downloadFun(episodeObj, siteType) {
-	nodeInput.question("input structure code:path, code:path ...\nor input 'n' to quit script\n==>", async ans => {
+	nodeInput.question("input structure code:path, code:path ...\nor all:/path/to/folder\nor input 'n' to quit script\n==>", async ans => {
 		if (["n","N","not","Not","NOT"].includes(ans) ) {
 			console.log("quit");
 			process.exit(0);
+		}
+		else if (/all/.test(ans)) {
+			console.log("autoName...");
+			return new Promise( (resolve) => {
+				let selectFolder = ans.split(/\s*:\s*/)[1];
+				if ( ! selectFolder.endsWith("/") ) {
+					selectFolder += "/";
+				}
+				resolve(selectFolder);
+			} ).then( async (selectFolder) => {
+				for ( let ptr = 0; ptr < episodeObj.length; ptr++ ) {
+					await downloader.typeOfDownload(episodeObj[ptr], siteType, selectFolder+(ptr+1)+".mp4");
+				}
+				process.exit(0);
+			} );
 		}
 		else {
 			return new Promise( (resolve) => {
@@ -60,7 +75,7 @@ function downloadFun(episodeObj, siteType) {
 				for ( let element of downloadStruct ) {
 					await downloader.typeOfDownload(episodeObj[element.ep], siteType, element.fileName);
 				}
-				process.exit(0);// problem here
+				process.exit(0);
 			});
 		}
 	});
