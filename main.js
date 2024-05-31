@@ -1,3 +1,4 @@
+const PLATFORM = process.platform;
 const nodeio = require("readline");
 const nodeInput = nodeio.createInterface( {
 	input: process.stdin,
@@ -54,8 +55,13 @@ function downloadFun(episodeObj, siteType) {
 			console.log("autoName...");
 			return new Promise( (resolve) => {
 				let selectFolder = ans.split(/\s*:\s*/)[1];
-				if ( ! selectFolder.endsWith("/") ) {
-					selectFolder += "/";
+				if ( ! selectFolder.endsWith("/") && ! selectFolder.endWith("\\") ) {
+					if ( PLATFORM == 'win32' ) {
+						selectFolder += "\\";
+					}
+					else {
+						selectFolder += "/";
+					}
 				}
 				resolve(selectFolder);
 			} ).then( async (selectFolder) => {
