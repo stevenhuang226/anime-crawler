@@ -38,7 +38,6 @@ function selectFun(titleArry, searchResult) {
 		console.log(`Selected: ${titleArry[ans]}(${searchResult[ans]})`);
 		console.log(`Try to request html from: ${searchResult[ans]}`);
 		const [episodeObj, siteType] = await crawler.typeOfSite(searchResult[ans]);
-		console.log(episodeObj);
 		episodeObj.forEach( (element, index) => {
 			console.log("code: %d\n  title: %s\n  url: %s\n-----end-----\n", index+1, element.title, element.url);
 		})
