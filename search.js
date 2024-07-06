@@ -81,7 +81,9 @@ async function reqTitle(urlArry) {
 	})
 	return Promise.all(promises).then( (results) => {
 		results.forEach( (element) => {
-			titleArry.push(element);
+			if ( ! /找不到/.test(element) && ! /頁面/.test(element) ) {
+				titleArry.push(element);
+			}
 		} )
 		return titleArry;
 	} ).catch( (error) => {

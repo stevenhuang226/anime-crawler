@@ -59,7 +59,8 @@ async function mySelf(theUrl) {
 		});
 		reqBody.end();
 	}).then( async (episodeObj) => {
-		let runTimes = parseInt(episodeObj.length / 12) + parseInt(11/episodeObj.length);
+		let runTimes = episodeObj.length%12 == 0 ? parseInt(episodeObj.length / 12) : parseInt(episodeObj.length / 12) + 1;
+		console.log(runTimes);
 		for ( let runtime = 0; runtime < runTimes; runtime++ ) {
 			let promises = [];
 			episodeObj.slice(12*runtime, 12*(runtime+1)).forEach( (element,index) => {
