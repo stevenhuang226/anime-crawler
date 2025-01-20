@@ -1,3 +1,5 @@
+# 已經無法使用，搜尋功能以及集數獲取器都已經失效
+
 ## 安裝
 ```
 git clone https://github.com/stevenhuang226/anime-crawler.git
